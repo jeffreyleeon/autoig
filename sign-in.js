@@ -12,29 +12,33 @@ var page = require('webpage').create();
 page.open('https://instagram.com/accounts/login/',
     function (status) {
         if (status === "success") {
-            function clickElement (identifier, method) {
-                var point = page.evaluate(function (iden, meth) {
+            function clickElement (identifier, method, position) {
+                var point = page.evaluate(function (iden, meth, pos) {
                     if (meth === "id") {
                         var element = document.getElementById(iden);
                     } else if (meth === "tag") {
-                        var element = document.getElementsByTagName(iden)[0];
+                        var element = document.getElementsByTagName(iden)[pos];
+                    } else if (meth === "class") {
+                        var element = document.getElementsByClassName(iden)[pos];
+                        console.log('element ' + element);
                     }
                     var rect = element.getBoundingClientRect();
                     return {
                         x: rect.left + Math.floor(rect.width / 2),
                         y: rect.top + Math.floor(rect.height / 2)
                     };
-                }, identifier, method);
+                }, identifier, method, position);
                 page.sendEvent('click', point.x, point.y);
             }
-            clickElement('lfFieldInputUsername', 'id');
+            clickElement('input', 'tag', 0);
             page.sendEvent('keypress', username);
 
-            clickElement('lfFieldInputPassword', 'id');
+            clickElement('input', 'tag', 1);
             page.sendEvent('keypress', password);
             
             page.render('before-submit.png');
-            clickElement('button', 'tag');
+            clickElement('button', 'tag', 0);
+            console.log('======successsss');
         }
         setTimeout(function () {
             var error = page.evaluate(function () {
